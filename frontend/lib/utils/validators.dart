@@ -1,6 +1,7 @@
 /// Utility class for input validation
 class Validators {
   /// Validate phone number
+  static String? validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
     }
