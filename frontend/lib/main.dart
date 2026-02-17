@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
@@ -13,3 +14,6 @@ void main() async {
   );
 }
 
+=======
+
+>>>>>>> f124215ba6bd6d49555cd1c85f21e13b1bd7f198
