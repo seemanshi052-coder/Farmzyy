@@ -1,0 +1,11 @@
+{
+  "feature_order": [
+    "nitrogen",
+    "phosphorus",
+    "potassium",
+    "temperature",
+    "humidity",
+    "ph",
+    "rainfall"
+  ]
+}

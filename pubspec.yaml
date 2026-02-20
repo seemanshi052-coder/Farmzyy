@@ -1,0 +1,42 @@
+name: farmzyy
+description: FarmZyy - AI Agricultural Advisory Platform
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+
+  # HTTP Client
+  dio: ^5.4.0
+
+  # Secure Storage
+  flutter_secure_storage: ^9.0.0
+
+  # Fonts
+  google_fonts: ^6.1.0
+
+  # Icons
+  cupertino_icons: ^1.0.6
+
+  # Utils
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.8
+  riverpod_generator: ^2.3.9
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
