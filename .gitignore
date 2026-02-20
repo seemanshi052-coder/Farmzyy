@@ -32,3 +32,27 @@ frontend/.flutter-plugins-dependencies
 # ===============================
 .DS_Store
 Thumbs.db
+# Flutter
+.dart_tool/
+.packages
+.pub/
+build/
+ios/Pods/
+android/.gradle/
+android/local.properties
+
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+
+# Models
+*.pkl
+*.h5
+*.pt
+*.joblib
+
+# System
+.DS_Store
+Thumbs.db
