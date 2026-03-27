@@ -13,7 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-<<<<<<< HEAD
+
   # HTTP & API
   dio: ^5.3.0
 
@@ -37,19 +37,19 @@ dependencies:
   # Logging
   logger: ^2.0.1
 
-=======
+
   flutter_riverpod: ^2.5.1
   dio: ^5.4.0
   flutter_secure_storage: ^9.0.0
   google_fonts: ^6.2.1
   intl: ^0.19.0
 
->>>>>>> 4b2481d780f9fb0cb2d21bbe264c4ca75ba1b5ff
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-<<<<<<< HEAD
+
   flutter_lints: ^6.0.0
   
   # Riverpod code generation
@@ -60,7 +60,6 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-=======
->>>>>>> 4b2481d780f9fb0cb2d21bbe264c4ca75ba1b5ff
+
 flutter:
   uses-material-design: true
