@@ -120,14 +120,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 =======
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/theme/app_theme.dart';
-import 'features/auth/screens/splash_screen.dart';
-import 'features/auth/screens/login_screen.dart';
-import 'features/navigation/main_navigation.dart';
-import 'features/crop/screens/crop_recommendation_screen.dart';
-import 'features/yield/screens/yield_prediction_screen.dart';
-import 'features/pest/screens/pest_prediction_screen.dart';
 
+import 'core/theme/app_theme.dart';
+import 'features/auth/screens/login_screen.dart';
+
+import 'features/auth/screens/splash_screen.dart';
+import 'features/crop/screens/crop_recommendation_screen.dart';
+import 'features/navigation/main_navigation.dart';
+import 'features/pest/screens/pest_prediction_screen.dart';
+import 'features/yield/screens/yield_prediction_screen.dart';
 void main() {
   runApp(
     const ProviderScope(

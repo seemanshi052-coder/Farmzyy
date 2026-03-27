@@ -1,7 +1,10 @@
 /// API Configuration
 class ApiConfig {
   // Base URL - Change this to your backend URL
-  static const String baseUrl = 'http://localhost:8000/api/v1';
+  static const String baseUrl = String.fromEnvironment(
+    'BASE_URL_API_V1',
+    defaultValue: 'http://10.0.2.2:8000/api/v1',
+  );
 
   // API Endpoints
   static const String authLoginEndpoint = '/auth/login';

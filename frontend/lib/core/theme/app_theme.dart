@@ -2,85 +2,85 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    primaryColor: const Color(0xFF2E7D32),
+  
+  // Color tokens used across newer + legacy UI files.
+  static const Color primary = Color(0xFF2E7D32);
+  static const Color primaryDark = Color(0xFF1B5E20);
+  static const Color primaryLight = Color(0xFF66BB6A);
+  static const Color accent = Color(0xFFFFB300);
+  static const Color accentYellow = Color(0xFFFBC02D);
 
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF2E7D32),
-      brightness: Brightness.light,
-    ),
+   
+  static const Color success = Color(0xFF2E7D32);
+  static const Color warning = Color(0xFFF57C00);
+  static const Color error = Color(0xFFC62828);
 
-    scaffoldBackgroundColor: const Color(0xFFF5F7F2),
+  static const Color surface = Colors.white;
+  static const Color background = Color(0xFFF5F7F2);
+  static const Color cardShadow = Color(0x1A000000);
+  static const Color textPrimary = Color(0xFF1A1A1A);
+  static const Color textSecondary = Color(0xFF6B7280);
 
-    textTheme: GoogleFonts.plusJakartaSansTextTheme(),
+  // Legacy aliases used in some screens/components.
+  static const Color primaryColor = primary;
+  static const Color secondaryColor = Color(0xFF1565C0);
+  static const Color accentColor = accent;
+  static const Color successColor = success;
+  static const Color warningColor = warning;
+  static const Color errorColor = error;
 
-    appBarTheme: AppBarTheme(
-      backgroundColor: Colors.green.shade700,
-      foregroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: GoogleFonts.plusJakartaSans(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-    ),
+   
+  static const double paddingSmall = 8;
+  static const double paddingMedium = 16;
+  static const double paddingLarge = 24;
+  static const double borderRadiusSmall = 8;
+  static const double borderRadiusMedium = 12;
 
-    cardTheme: CardThemeData(
-      elevation: 2,
-      margin: const EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-    ),
+    
+  static ThemeData get theme => lightTheme;
 
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green.shade700,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 14,
+  static ThemeData get lightTheme => ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primary,
+          brightness: Brightness.light,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+        
+        scaffoldBackgroundColor: background,
+        textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
+          bodyLarge: GoogleFonts.plusJakartaSans(color: textPrimary),
+          bodyMedium: GoogleFonts.plusJakartaSans(color: textPrimary),
         ),
-        textStyle: GoogleFonts.plusJakartaSans(
-          fontWeight: FontWeight.w600,
+        
+        appBarTheme: AppBarTheme(
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: GoogleFonts.plusJakartaSans(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
-      ),
-    ),
 
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 14,
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: Colors.green.shade700,
-          width: 1.5,
+        cardTheme: CardThemeData(
+          color: surface,
+          elevation: 2,
+          margin: const EdgeInsets.all(8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-      ),
-    ),
+      
+    
+      );
 
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      selectedItemColor: Colors.green.shade700,
-      unselectedItemColor: Colors.grey,
-      showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed,
-    ),
-  );
+    
+  static ThemeData get darkTheme => ThemeData.dark(useMaterial3: true).copyWith(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primary,
+          brightness: Brightness.dark,
+        ),
+      );
 }

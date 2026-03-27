@@ -1,7 +1,11 @@
 /// Environment configuration for the FarmZyy app
 class Environment {
   // API Configuration
-  static const String apiBaseUrl = 'http://localhost:8000/api/v1';
+static const String baseUrl = String.fromEnvironment(
+    'BASE_URL_API_V1',
+    defaultValue: 'http://10.0.2.2:8000/api/v1',
+  );
+
 
   // Development settings
   static const bool debugMode = true;

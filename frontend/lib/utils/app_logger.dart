@@ -9,7 +9,6 @@ class AppLogger {
       lineLength: 120,
       colors: true,
       printEmojis: true,
-      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
   );
 
@@ -35,6 +34,3 @@ class AppLogger {
 
   /// Log fatal/critical level messages
   static void fatal(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.f(message, error: error, stackTrace: stackTrace);
-  }
-}

@@ -1,59 +1,33 @@
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/config/environment.dart';
-import '../../utils/app_exceptions.dart';
-import '../../utils/app_logger.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Base HTTP service for API calls
+/// Unified API service for frontend <-> backend communication.
+///
+/// Configure backend URL with:
+/// flutter run --dart-define=BASE_URL_API_V1=http://10.0.2.2:8000/api/v1
 class ApiService {
-  late Dio _dio;
-  late SharedPreferences _prefs;
-
-  ApiService() {
-    _initializeDio();
-  }
-
-  /// Initialize Dio with base options and interceptors
-  void _initializeDio() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: Environment.apiBaseUrl,
-        connectTimeout: Environment.apiTimeout,
-        receiveTimeout: Environment.apiTimeout,
-        responseType: ResponseType.json,
-        contentType: 'application/json',
-      ),
-    );
-
-    // Add logging interceptor
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          AppLogger.debug('API Request: ${options.method} ${options.path}');
-          AppLogger.debug('Headers: ${options.headers}');
-          if (options.data != null) {
-            AppLogger.debug('Request Body: ${options.data}');
-          }
-          return handler.next(options);
-        },
-        onResponse: (response, handler) {
-          AppLogger.debug('API Response: ${response.statusCode} ${response.requestPath}');
-          AppLogger.debug('Response: ${response.data}');
-          return handler.next(response);
-        },
-        onError: (error, handler) {
-          AppLogger.error('API Error: ${error.message}');
-          return handler.next(error);
-        },
-      ),
-    );
-
-    // Add token interceptor
+  ApiService({
+    Dio? dio,
+    FlutterSecureStorage? storage,
+  })  : _storage = storage ?? const FlutterSecureStorage(),
+        _dio = dio ??
+            Dio(
+              BaseOptions(
+                baseUrl: const String.fromEnvironment(
+                  'BASE_URL_API_V1',
+                  defaultValue: 'http://10.0.2.2:8000/api/v1',
+                ),
+                connectTimeout: const Duration(seconds: 30),
+                receiveTimeout: const Duration(seconds: 30),
+                sendTimeout: const Duration(seconds: 30),
+                contentType: 'application/json',
+                responseType: ResponseType.json,
+              ),
+            ) {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await _getToken();
-          if (token != null) {
+          final token = await _storage.read(key: _tokenKey);
+          if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
           return handler.next(options);
@@ -62,180 +36,96 @@ class ApiService {
     );
   }
 
-  /// Initialize SharedPreferences
-  Future<void> initializePrefs() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
+  final Dio _dio;
+  final FlutterSecureStorage _storage;
 
-  /// Get stored JWT token
-  Future<String?> _getToken() async {
-    try {
-      return _prefs.getString(Environment.tokenKey);
-    } catch (e) {
-      AppLogger.error('Error retrieving token: $e');
-      return null;
-    }
-  }
+  static const String _tokenKey = 'access_token';
 
-  /// Save JWT token
-  Future<void> saveToken(String token) async {
-    try {
-      await _prefs.setString(Environment.tokenKey, token);
-      AppLogger.info('Token saved successfully');
-    } catch (e) {
-      AppLogger.error('Error saving token: $e');
-      throw CacheException(
-        message: 'Failed to save token',
-        originalError: e,
-      );
-    }
-  }
+  Future<void> saveToken(String token) => _storage.write(key: _tokenKey, value: token);
 
-  /// Clear stored token
-  Future<void> clearToken() async {
-    try {
-      await _prefs.remove(Environment.tokenKey);
-      AppLogger.info('Token cleared successfully');
-    } catch (e) {
-      AppLogger.error('Error clearing token: $e');
-      throw CacheException(
-        message: 'Failed to clear token',
-        originalError: e,
-      );
-    }
-  }
+  Future<void> clearToken() => _storage.delete(key: _tokenKey);
 
-  /// GET request
   Future<Map<String, dynamic>> get(
-    String endpoint, {
+    String path, {
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
-      final response = await _dio.get(
-        endpoint,
-        queryParameters: queryParameters,
-      );
-      return _handleResponse(response);
+      final response = await _dio.get(path, queryParameters: queryParameters);
+      return _asMap(response.data);
     } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      AppLogger.error('Unexpected error in GET request: $e');
-      throw AppException(message: 'Unexpected error occurred', originalError: e) as AppException;
+      throw Exception(_errorMessage(e));
     }
   }
 
-  /// POST request
   Future<Map<String, dynamic>> post(
-    String endpoint, {
+    String path, {
     dynamic data,
+    Map<String, dynamic>? queryParameters,
   }) async {
     try {
       final response = await _dio.post(
-        endpoint,
+        path,
         data: data,
+        queryParameters: queryParameters,
       );
-      return _handleResponse(response);
+      return _asMap(response.data);
     } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      AppLogger.error('Unexpected error in POST request: $e');
-      throw AppException(message: 'Unexpected error occurred', originalError: e) as AppException;
+      throw Exception(_errorMessage(e));
     }
   }
 
-  /// PUT request
   Future<Map<String, dynamic>> put(
-    String endpoint, {
+    String path, {
     dynamic data,
   }) async {
     try {
-      final response = await _dio.put(
-        endpoint,
-        data: data,
-      );
-      return _handleResponse(response);
+      final response = await _dio.put(path, data: data);
+      return _asMap(response.data);
     } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      AppLogger.error('Unexpected error in PUT request: $e');
-      throw AppException(message: 'Unexpected error occurred', originalError: e) as AppException;
+      throw Exception(_errorMessage(e));
     }
   }
 
-  /// DELETE request
   Future<Map<String, dynamic>> delete(
-    String endpoint, {
+    String path, {
     dynamic data,
   }) async {
     try {
-      final response = await _dio.delete(
-        endpoint,
-        data: data,
-      );
-      return _handleResponse(response);
+      final response = await _dio.delete(path, data: data);
+      return _asMap(response.data);
     } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      AppLogger.error('Unexpected error in DELETE request: $e');
-      throw AppException(message: 'Unexpected error occurred', originalError: e) as AppException;
+      throw Exception(_errorMessage(e));
     }
   }
 
-  /// Handle successful response
-  Map<String, dynamic> _handleResponse(Response response) {
-    try {
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> responseData = response.data is Map<String, dynamic>
-            ? response.data
-            : {'data': response.data};
-        return responseData;
-      } else {
-        throw ServerException(
-          message: 'Server returned status code: ${response.statusCode}',
-          statusCode: response.statusCode,
-        );
+  Map<String, dynamic> _asMap(dynamic data) {
+    if (data is Map<String, dynamic>) return data;
+    return {'data': data};
+  }
+
+  String _errorMessage(DioException e) {
+    final responseData = e.response?.data;
+    if (responseData is Map<String, dynamic>) {
+      final message = responseData['message'] ??
+          (responseData['error'] is Map<String, dynamic>
+              ? responseData['error']['message']
+              : null);
+      if (message is String && message.isNotEmpty) {
+        return message;
       }
-    } catch (e) {
-      AppLogger.error('Error handling response: $e');
-      rethrow;
     }
-  }
 
-  /// Handle DioException
-  AppException _handleDioError(DioException error) {
-    AppLogger.error('DioException: ${error.type} - ${error.message}');
-
-    switch (error.type) {
+    switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.sendTimeout:
-        return TimeoutException(
-          message: 'Request timed out',
-          originalError: error,
-        );
-      case DioExceptionType.badResponse:
-        final statusCode = error.response?.statusCode;
-        if (statusCode == 401) {
-          return AuthException(
-            message: 'Unauthorized access',
-            originalError: error,
-          );
-        }
-        return ServerException(
-          message: error.response?.data['error']?['message'] ?? 'Server error',
-          statusCode: statusCode,
-          originalError: error,
-        );
+        return 'Request timed out. Please try again.';
       case DioExceptionType.connectionError:
-        return NetworkException(
-          message: 'No internet connection',
-          originalError: error,
-        );
+        return 'Cannot connect to backend. Check BASE_URL_API_V1 and internet.';
+      case DioExceptionType.badResponse:
+        return 'Server error: ${e.response?.statusCode ?? 'unknown'}';
       default:
-        return NetworkException(
-          message: error.message ?? 'Network error',
-          originalError: error,
-        );
+        return e.message ?? 'Unexpected network error';
     }
   }
 }
